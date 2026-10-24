@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام حساب ذرعة السيارات الخاص بمعمل القالب</title>
+    <!-- Cairo Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-main: #090d16;
+            --bg-card: rgba(19, 27, 46, 0.85);
+            --bg-card-hover: #1c273e;
+            --bg-input: rgba(30, 41, 59, 0.8);
+            --border-color: rgba(46, 61, 82, 0.8);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            /* Color accents */
+            --btn-north: #1e3a8a;
+            --btn-south: #064e3b;
+            --btn-search: #7c2d12;
+            --btn-table: #334155;
+            
+            --accent-gold: #fbbf24;
+            --accent-cyan: #38bdf8;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            /* خلفية النظام العامة (الصورة الثانية) */
+            background: url('Gemini_Generated_Image_verff3verff3verf.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Access Lock Screen (شاشة رمز الدخول مع الصورة الأولى) */
+        #mainAuthScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('Gemini_Generated_Image_soxj45soxj45soxj.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background-color: rgba(19, 27, 46, 0.65);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+
+        .auth-icon {
+            font-size: 3rem;
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+            background: rgba(251, 191, 36, 0.1);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .auth-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .auth-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        /* Top News Ticker */
+        .ticker-wrap {
+            width: 100%;
+            background: rgba(2, 132, 199, 0.85);
+            backdrop-filter: blur(5px);
+            color: #ffffff;
+            height: 38px;
+            line-height: 38px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 100;
+        }
+        .ticker-move {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            animation: marquee 45s linear infinite;
+        }
+        .ticker-move:hover { animation-play-state: paused; }
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2.5rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        @keyframes marquee {
+            0% { transform: translate3d(100%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* Container & Layout Structure */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            flex: 1;
+            display: none; /* ينعرض بعد الدخول */
+        }
+
+        /* Title Header */
+        .header-title-card {
+            background-color: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title-wrap i {
+            font-size: 2rem;
+            color: var(--accent-gold);
+            background: rgba(251, 191, 36, 0.12);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .header-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .header-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Connection Status */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background-color: rgba(30, 41, 59, 0.6);
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #eab308;
+            display: inline-block;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .status-dot.connected { background-color: #10b981; }
+        .status-dot.disconnected { background-color: #ef4444; }
+
+        /* Main Dashboard Grid Split */
+        .main-dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .main-dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-stats {
+                order: 2;
+            }
+            .main-content-area {
+                order: 1;
+            }
+        }
+
+        /* Sidebar Stats Panel */
+        .sidebar-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-info h4 {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-info p {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .stat-icon.gold { background: rgba(251, 191, 36, 0.15); color: #facd15; }
+        .stat-icon.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+        /* Main Content Area */
+        .main-content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Buttons Grid */
+        .main-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 22px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-action i { font-size: 2rem; margin-bottom: 10px; }
+        .btn-action span.btn-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; }
+        .btn-action span.btn-desc { font-size: 0.78rem; opacity: 0.8; }
+
+        .btn-north-site { background: linear-gradient(135deg, rgba(30, 58, 138, 0.9), rgba(29, 78, 216, 0.9)); border-color: #3b82f6; }
+        .btn-south-site { background: linear-gradient(135deg, rgba(6, 78, 59, 0.9), rgba(4, 120, 87, 0.9)); border-color: #10b981; }
+        .btn-search-site { background: linear-gradient(135deg, rgba(124, 45, 18, 0.9), rgba(194, 65, 12, 0.9)); border-color: #f97316; }
+        .btn-table-site { background: linear-gradient(135deg, rgba(51, 65, 85, 0.9), rgba(71, 85, 105, 0.9)); border-color: #64748b; }
+
+        /* Tables & Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 5px;
+        }
+
+        .section-header h3 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .section-header h3 i { color: var(--accent-gold); }
+
+        .table-responsive { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); backdrop-filter: blur(8px); }
+        .custom-table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.88rem; }
+        .custom-table th { background-color: rgba(30, 41, 59, 0.9); color: var(--text-secondary); padding: 12px 14px; font-weight: 700; border-bottom: 2px solid var(--border-color); }
+        .custom-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+
+        .badge-site { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .badge-north { background: rgba(37, 99, 235, 0.2); color: #93c5fd; border: 1px solid rgba(37, 99, 235, 0.4); }
+        .badge-south { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+        .action-icon-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; }
+        .action-icon-btn.edit:hover { color: #60a5fa; }
+        .action-icon-btn.delete:hover { color: #f87171; }
+        .action-icon-btn.print:hover { color: #38bdf8; }
+
+        .empty-state { text-align: center; padding: 35px 20px; color: var(--text-muted); }
+
+        /* Modals & Forms */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+            padding: 15px;
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-container {
+            background-color: rgba(19, 27, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-container.large { max-width: 1100px; }
+        .modal-container.small { max-width: 420px; }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-close-modal {
+            background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;
+        }
+
+        .modal-body { padding: 24px; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+
+        .form-control {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .trailer-toggle-box {
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px dashed #334155;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin: 15px 0 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .trailer-toggle-label {
+            display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--accent-gold); font-size: 0.95rem;
+        }
+
+        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155; transition: .3s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .trailer-fields-card {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .trailer-fields-card.active { display: block; }
+
+        .calc-result-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .calc-result-box .val { font-size: 1.4rem; font-weight: 800; color: #60a5fa; }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: #2563eb; color: #fff; }
+        .btn-secondary { background-color: #334155; color: #cbd5e1; }
+        .btn-danger { background-color: #dc2626; color: #fff; }
+        .btn-success { background-color: #059669; color: #fff; }
+
+        .error-message { color: #f87171; font-size: 0.82rem; margin-top: 5px; display: none; }
+
+        footer { text-align: center; padding: 15px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: auto; background: rgba(9, 13, 22, 0.8); }
+
+        /* Single Print A4 Template Styling */
+        #singlePrintTemplate {
+            display: none;
+            background: #ffffff;
+            color: #000000;
+            padding: 40px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .single-print-card {
+            border: 2px solid #000;
+            padding: 25px;
+            border-radius: 6px;
+        }
+
+        .single-print-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .single-print-header h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #000;
+        }
+
+        .single-print-header p {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .single-print-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .single-print-details td, .single-print-details th {
+            border: 1px solid #333;
+            padding: 12px 15px;
+            font-size: 1.05rem;
+            text-align: right;
+        }
+
+        .single-print-details th {
+            background-color: #f1f5f9;
+            font-weight: 800;
+            width: 30%;
+        }
+
+        .single-print-signatures {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 220px;
+        }
+
+        .signature-box p {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 50px;
+        }
+
+        .signature-line {
+            border-top: 2px dashed #000;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .ticker-wrap, .status-bar, .main-buttons-grid, .sidebar-stats, .btn, .modal-header .btn-close-modal, .action-icon-btn, footer, #mainAuthScreen { display: none !important; }
+            
+            /* General Table Print */
+            body.print-all #allDataTableModal, body.print-all #allDataTableModal * {
+                visibility: visible;
+            }
+            body.print-all #allDataTableModal {
+                position: absolute; left: 0; top: 0; width: 100%; background: #ffffff !important; color: #000000 !important;
+            }
+            body.print-all .modal-container { max-width: 100% !important; box-shadow: none !important; border: none !important; }
+            body.print-all .custom-table th { background-color: #f1f5f9 !important; color: #000000 !important; border: 1px solid #cbd5e1 !important; }
+            body.print-all .custom-table td { color: #000000 !important; border: 1px solid #cbd5e1 !important; }
+            body.print-all .print-title-header { display: block !important; text-align: center; margin-bottom: 20px; }
+            
+            /* Single A4 Print */
+            body.print-single #singlePrintTemplate, body.print-single #singlePrintTemplate * {
+                visibility: visible;
+            }
+            body.print-single #singlePrintTemplate {
+                display: block !important;
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+        .print-title-header { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Access Lock Screen (الصورة الأولى لخلفية رمز الدخول) -->
+    <div id="mainAuthScreen">
+        <div class="auth-card">
+            <div class="auth-icon"><i class="fa-solid fa-lock"></i></div>
+            <h2 class="auth-title">معمل القالب للكونكريت</h2>
+            <p class="auth-sub">يرجى إدخال رمز الدخول للوصول إلى النظام</p>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="password" id="mainPassInput" class="form-control" placeholder="رمز الدخول..." style="text-align: center; font-size: 1.4rem; letter-spacing: 4px;" onkeyup="if(event.key==='Enter') loginSystem()">
+                <div id="mainAuthError" class="error-message"><i class="fa-solid fa-triangle-exclamation"></i> رمز الدخول غير صحيح!</div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;" onclick="loginSystem()">دخول للنظام</button>
+        </div>
+    </div>
+
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker-move">
+            <div class="ticker-item"><i class="fa-solid fa-code"></i> التصميم مهند صباح 07860001700</div>
+            <div class="ticker-item"><i class="fa-solid fa-truck-front"></i> نظام حساب ذرعة السيارات الخاص بمعمل القالب</div>
+            <div class="ticker-item"><i class="fa-solid fa-code"></i> التصميم مهند صباح 07860001700</div>
+        </div>
+    </div>
+
+    <!-- Container (الصورة الثانية خلفية للنظام) -->
+    <div class="container" id="mainContainer">
+
+        <!-- Title Header without Image -->
+        <div class="header-title-card">
+            <div class="header-title-wrap">
+                <i class="fa-solid fa-truck-field"></i>
+                <div>
+                    <h1 class="header-title">نظام حساب ذرعة السيارات الخاص بمعمل القالب</h1>
+                    <p class="header-subtitle" id="activeSiteBadge">إدارة الذرعات وتتبع الأحجام والكميات الموردة للمواقع</p>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="status-bar">
+                    <span id="statusDot" class="status-dot"></span>
+                    <span id="statusText">جاري الاتصال...</span>
+                </div>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.8rem;" onclick="logoutSystem()" title="قفل النظام"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Layout Split -->
+        <div class="main-dashboard-grid">
+
+            <!-- Main Content (Right) -->
+            <div class="main-content-area">
+                <!-- Buttons Grid (ديناميكي بناءً على الرمز) -->
+                <div class="main-buttons-grid">
+                    <div id="btnNorthSite" class="btn-action btn-north-site" style="display:none;" onclick="openAddForm('الموقع الشمالي')">
+                        <i class="fa-solid fa-square-plus"></i>
+                        <span class="btn-title">إضافة ذرعة (شمالي)</span>
+                    </div>
+
+                    <div id="btnSouthSite" class="btn-action btn-south-site" style="display:none;" onclick="openAddForm('الموقع الجنوبي')">
+                        <i class="fa-solid fa-circle-plus"></i>
+                        <span class="btn-title">إضافة ذرعة (جنوبي)</span>
+                    </div>
+
+                    <div class="btn-action btn-search-site" onclick="openModal('searchModal')">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span class="btn-title">البحث عن سيارة</span>
+                        <span class="btn-desc">سيارة / سائق / تاريخ</span>
+                    </div>
+
+                    <div class="btn-action btn-table-site" onclick="openModal('allDataTableModal')">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span class="btn-title">الجدول العام</span>
+                        <span class="btn-desc">عرض وتعديل وتصدير</span>
+                    </div>
+                </div>
+
+                <!-- Recent Table -->
+                <div class="section-header">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> آخر الذرعات المسجلة مؤخراً</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ والوقت</th>
+                                <th>رقم السيارة</th>
+                                <th>السائق</th>
+                                <th>الموقع</th>
+                                <th>الأبعاد (م)</th>
+                                <th>العربانة</th>
+                                <th>الكمية (م³)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentRecordsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sidebar Statistics (Left) -->
+            <div class="sidebar-stats">
+                <div class="sidebar-title">
+                    <i class="fa-solid fa-chart-pie" style="color:var(--accent-gold);"></i> إحصائيات النظام
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4>إجمالي الذرعات المسجلة</h4>
+                        <p id="statTotalCount">0</p>
+                    </div>
+                    <div class="stat-icon blue"><i class="fa-solid fa-truck-moving"></i></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4>إجمالي الكميات (م³)</h4>
+                        <p id="statTotalVolume">0.00</p>
+                    </div>
+                    <div class="stat-icon green"><i class="fa-solid fa-cubes"></i></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4>الموقع الشمالي</h4>
+                        <p id="statNorthCount">0</p>
+                    </div>
+                    <div class="stat-icon gold"><i class="fa-solid fa-compass-north"></i></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4>الموقع الجنوبي</h4>
+                        <p id="statSouthCount">0</p>
+                    </div>
+                    <div class="stat-icon purple"><i class="fa-solid fa-location-dot"></i></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        نظام حساب ذرعة السيارات الخاص بمعمل القالب &copy; 2026 | التصميم مهند صباح 07860001700
+    </footer>
+
+    <!-- MODALS -->
+    <!-- Add/Edit Entry Modal -->
+    <div id="entryFormModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="formTitle"><i class="fa-solid fa-truck-ramp-box"></i> إضافة ذرعة سيارة جديدة</h3>
+                <button class="btn-close-modal" onclick="closeModal('entryFormModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="recordForm" onsubmit="saveRecord(event)">
+                    <input type="hidden" id="editRecordId">
+                    <input type="hidden" id="recordSite">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>الموقع المحدد</label>
+                            <input type="text" id="displaySiteName" class="form-control" readonly style="font-weight:700; color:var(--accent-gold);">
+                        </div>
+                        <div class="form-group">
+                            <label>التاريخ والوقت</label>
+                            <input type="datetime-local" id="recordDateTime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>رقم السيارة / المقطورة</label>
+                            <input type="text" id="truckNumber" class="form-control" placeholder="مثال: 12345 أ" required>
+                        </div>
+                        <div class="form-group">
+                            <label>اسم السائق</label>
+                            <input type="text" id="driverName" class="form-control" placeholder="اسم السائق الثلاثي" required>
+                        </div>
+                        <div class="form-group">
+                            <label>نوع المادة / الحمولة</label>
+                            <input type="text" id="materialType" class="form-control" placeholder="خرسانة، حصى، رمل..." required>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top:20px; font-size:0.95rem; color:var(--accent-cyan);"><i class="fa-solid fa-ruler-combined"></i> أبعاد صندوق السيارة الرئيسي (بالمتر)</h4>
+                    <div class="form-grid" style="margin-top:10px;">
+                        <div class="form-group">
+                            <label>الطول (م)</label>
+                            <input type="number" step="0.01" id="truckLength" class="form-control" placeholder="0.00" oninput="calculateVolumes()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>العرض (م)</label>
+                            <input type="number" step="0.01" id="truckWidth" class="form-control" placeholder="0.00" oninput="calculateVolumes()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الارتفاع (م)</label>
+                            <input type="number" step="0.01" id="truckHeight" class="form-control" placeholder="0.00" oninput="calculateVolumes()" required>
+                        </div>
+                    </div>
+
+                    <div class="trailer-toggle-box">
+                        <div class="trailer-toggle-label"><i class="fa-solid fa-trailer"></i> إضافة ذرعة العربانة الملحقة؟</div>
+                        <label class="switch">
+                            <input type="checkbox" id="hasTrailerToggle" onchange="toggleTrailerSection()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="trailerSection" class="trailer-fields-card">
+                        <h4 style="margin-bottom:10px; font-size:0.9rem; color:var(--success-color);"><i class="fa-solid fa-ruler-vertical"></i> أبعاد العربانة (بالمتر)</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>طول العربانة (م)</label>
+                                <input type="number" step="0.01" id="trailerLength" class="form-control" placeholder="0.00" oninput="calculateVolumes()">
+                            </div>
+                            <div class="form-group">
+                                <label>عرض العربانة (م)</label>
+                                <input type="number" step="0.01" id="trailerWidth" class="form-control" placeholder="0.00" oninput="calculateVolumes()">
+                            </div>
+                            <div class="form-group">
+                                <label>ارتفاع العربانة (م)</label>
+                                <input type="number" step="0.01" id="trailerHeight" class="form-control" placeholder="0.00" oninput="calculateVolumes()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calc-result-box">
+                        <div style="font-size:0.85rem; color:var(--text-secondary);">إجمالي الذرعة الكلية (السيارة + العربانة)</div>
+                        <div class="val" id="totalVolumeDisplay">0.00 م³</div>
+                    </div>
+
+                    <div class="form-group full-width" style="margin-top:15px;">
+                        <label>ملاحظات إضافية</label>
+                        <textarea id="recordNotes" class="form-control" rows="2" placeholder="تفاصيل إضافية..."></textarea>
+                    </div>
+
+                    <div class="modal-footer" style="padding-right:0; padding-left:0;">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('entryFormModal')">إلغاء</button>
+                        <button type="submit" class="btn btn-success"><i class="fa-solid fa-floppy-disk"></i> حفظ الذرعة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-magnifying-glass"></i> البحث المتقدم عن ذرعة</h3>
+                <button class="btn-close-modal" onclick="closeModal('searchModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" style="margin-bottom:15px;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="ابحث برقم السيارة، اسم السائق، أو نوع المادة..." oninput="executeSearch()">
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>رقم السيارة</th>
+                                <th>السائق</th>
+                                <th>الموقع</th>
+                                <th>الحجم الكلي (م³)</th>
+                                <th>خيار الطباعة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchResultsBody">
+                            <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">أدخل كلمة البحث للبدء...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Data Table Modal -->
+    <div id="allDataTableModal" class="modal-overlay">
+        <div class="modal-container large">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-table-list"></i> جدول ذرعة السيارات الخاص بمعمل القالب (الجدول العام)</h3>
+                <button class="btn-close-modal" onclick="closeModal('allDataTableModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="print-title-header">
+                    <h2>نظام حساب ذرعة السيارات الخاص بمعمل القالب</h2>
+                    <p>تقرير الذرعات الشامل والموقع العام</p>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-secondary" onclick="printAllRecords()"><i class="fa-solid fa-print"></i> طباعة التقرير العام</button>
+                        <button class="btn btn-danger" onclick="removeDuplicatesByTruckNumber()"><i class="fa-solid fa-filter-circle-xmark"></i> إزالة التكرار (رقم السيارة)</button>
+                    </div>
+                    <span style="font-size:0.85rem; color:var(--text-secondary);">إجمالي السجلات: <strong id="modalTotalCount" style="color:#fff;">0</strong></span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>التاريخ والوقت</th>
+                                <th>الموقع</th>
+                                <th>رقم السيارة</th>
+                                <th>اسم السائق</th>
+                                <th>نوع المادة</th>
+                                <th>أبعاد السيارة (ط×ع×ر)</th>
+                                <th>أبعاد العربانة (ط×ع×ر)</th>
+                                <th>الحجم الكلي (م³)</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allDataTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('allDataTableModal')">إغلاق النافذة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Single A4 Print Template Hidden Structure -->
+    <div id="singlePrintTemplate">
+        <div class="single-print-card">
+            <div class="single-print-header">
+                <h2>نموذج ذرعة سيارة - معمل القالب</h2>
+                <p>إيصال تفصيلي رسمي بحجم A4</p>
+            </div>
+            <table class="single-print-details">
+                <tr>
+                    <th>تاريخ والوقت المسجل:</th>
+                    <td id="pDate"></td>
+                </tr>
+                <tr>
+                    <th>موقع التسليم:</th>
+                    <td id="pSite"></td>
+                </tr>
+                <tr>
+                    <th>رقم السيارة / المقطورة:</th>
+                    <td id="pTruckNum"></td>
+                </tr>
+                <tr>
+                    <th>اسم السائق:</th>
+                    <td id="pDriver"></td>
+                </tr>
+                <tr>
+                    <th>نوع المادة / الحمولة:</th>
+                    <td id="pMaterial"></td>
+                </tr>
+                <tr>
+                    <th>أبعاد صندوق السيارة (ط×ع×ر):</th>
+                    <td id="pTruckDim"></td>
+                </tr>
+                <tr>
+                    <th>حجم السيارة الرئيسي:</th>
+                    <td id="pTruckVol"></td>
+                </tr>
+                <tr>
+                    <th>أبعاد العربانة الملحقة:</th>
+                    <td id="pTrailerDim"></td>
+                </tr>
+                <tr>
+                    <th>حجم العربانة الملحقة:</th>
+                    <td id="pTrailerVol"></td>
+                </tr>
+                <tr style="background-color: #f8fafc;">
+                    <th>إجمالي الذرعة الكلية:</th>
+                    <td id="pTotalVol" style="font-weight: 800; font-size: 1.2rem;"></td>
+                </tr>
+                <tr>
+                    <th>ملاحظات إضافية:</th>
+                    <td id="pNotes"></td>
+                </tr>
+            </table>
+
+            <div class="single-print-signatures">
+                <div class="signature-box">
+                    <p>توقيع السائق</p>
+                    <div class="signature-line"></div>
+                </div>
+                <div class="signature-box">
+                    <p>توقيع المستلم / المسؤول</p>
+                    <div class="signature-line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & Logic Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFWcdglbZulceFyFEsIBhZ6t6wEC1A-DQ",
+            authDomain: "alqalabmauad-f3535.firebaseapp.com",
+            projectId: "alqalabmauad-f3535",
+            storageBucket: "alqalabmauad-f3535.firebasestorage.app",
+            messagingSenderId: "55333980592",
+            appId: "1:55333980592:web:920a45ad12062b9d16ae75",
+            measurementId: "G-61DCC9G234"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const recordsRef = ref(db, 'records');
+
+        let records = [];
+        let activeUserSite = '';
+
+        const STORAGE_KEY = 'mould_factory_records_db';
+
+        window.loginSystem = function() {
+            const pass = document.getElementById('mainPassInput').value.trim();
+            const errDiv = document.getElementById('mainAuthError');
+            
+            if (pass === '4444') {
+                activeUserSite = 'الموقع الشمالي';
+                showMainDashboard();
+            } else if (pass === '1111') {
+                activeUserSite = 'الموقع الجنوبي';
+                showMainDashboard();
+            } else {
+                errDiv.style.display = 'block';
+            }
+        };
+
+        window.logoutSystem = function() {
+            activeUserSite = '';
+            document.getElementById('mainPassInput').value = '';
+            document.getElementById('mainAuthScreen').style.display = 'flex';
+            document.getElementById('mainContainer').style.display = 'none';
+        };
+
+        function showMainDashboard() {
+            document.getElementById('mainAuthScreen').style.display = 'none';
+            document.getElementById('mainAuthError').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+
+            const btnNorth = document.getElementById('btnNorthSite');
+            const btnSouth = document.getElementById('btnSouthSite');
+            const siteBadge = document.getElementById('activeSiteBadge');
+
+            if (activeUserSite === 'الموقع الشمالي') {
+                btnNorth.style.display = 'flex';
+                btnSouth.style.display = 'none';
+                siteBadge.innerText = 'لوحة تحكم: الموقع الشمالي';
+            } else if (activeUserSite === 'الموقع الجنوبي') {
+                btnNorth.style.display = 'none';
+                btnSouth.style.display = 'flex';
+                siteBadge.innerText = 'لوحة تحكم: الموقع الجنوبي';
+            }
+        }
+
+        onValue(recordsRef, (snapshot) => {
+            const data = snapshot.val();
+            records = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    records.push({ id: key, ...data[key] });
+                });
+                records.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+            }
+            saveLocalBackup();
+            updateConnectionStatus(true);
+            renderAll();
+        }, (error) => {
+            console.warn("Firebase rules or network issue:", error);
+            updateConnectionStatus(false);
+            loadLocalBackup();
+        });
+
+        function updateConnectionStatus(isConnected) {
+            const dot = document.getElementById('statusDot');
+            const txt = document.getElementById('statusText');
+            if (isConnected) {
+                dot.className = 'status-dot connected';
+                txt.innerText = 'متصل بالسحاب (Firebase)';
+            } else {
+                dot.className = 'status-dot disconnected';
+                txt.innerText = 'تخزين محلي مؤقت';
+            }
+        }
+
+        function saveLocalBackup() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        function loadLocalBackup() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            records = data ? JSON.parse(data) : [];
+            renderAll();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLocalBackup();
+            setDefaultDateTime();
+        });
+
+        function setDefaultDateTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('recordDateTime').value = now.toISOString().slice(0, 16);
+        }
+
+        window.openAddForm = function(siteName) {
+            document.getElementById('recordForm').reset();
+            document.getElementById('editRecordId').value = '';
+            document.getElementById('recordSite').value = siteName;
+            document.getElementById('displaySiteName').value = siteName;
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-plus"></i> إضافة ذرعة جديدة - ${siteName}`;
+            
+            toggleTrailerSection();
+            calculateVolumes();
+            setDefaultDateTime();
+            openModal('entryFormModal');
+        };
+
+        window.toggleTrailerSection = function() {
+            const hasTrailer = document.getElementById('hasTrailerToggle').checked;
+            const trailerSection = document.getElementById('trailerSection');
+            if (hasTrailer) {
+                trailerSection.classList.add('active');
+            } else {
+                trailerSection.classList.remove('active');
+                document.getElementById('trailerLength').value = '';
+                document.getElementById('trailerWidth').value = '';
+                document.getElementById('trailerHeight').value = '';
+            }
+            calculateVolumes();
+        };
+
+        window.calculateVolumes = function() {
+            const tL = parseFloat(document.getElementById('truckLength').value) || 0;
+            const tW = parseFloat(document.getElementById('truckWidth').value) || 0;
+            const tH = parseFloat(document.getElementById('truckHeight').value) || 0;
+            const truckVol = tL * tW * tH;
+
+            let trailerVol = 0;
+            if (document.getElementById('hasTrailerToggle').checked) {
+                const trL = parseFloat(document.getElementById('trailerLength').value) || 0;
+                const trW = parseFloat(document.getElementById('trailerWidth').value) || 0;
+                const trH = parseFloat(document.getElementById('trailerHeight').value) || 0;
+                trailerVol = trL * trW * trH;
+            }
+
+            const totalVol = truckVol + trailerVol;
+            document.getElementById('totalVolumeDisplay').innerText = `${totalVol.toFixed(2)} م³`;
+            return { truckVol, trailerVol, totalVol };
+        };
+
+        window.saveRecord = function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editRecordId').value;
+            const volumes = calculateVolumes();
+            const recordId = editId ? editId : 'loc_' + Date.now();
+
+            const recordData = {
+                site: document.getElementById('recordSite').value,
+                dateTime: document.getElementById('recordDateTime').value,
+                truckNumber: document.getElementById('truckNumber').value.trim(),
+                driverName: document.getElementById('driverName').value.trim(),
+                materialType: document.getElementById('materialType').value.trim(),
+                truckL: parseFloat(document.getElementById('truckLength').value) || 0,
+                truckW: parseFloat(document.getElementById('truckWidth').value) || 0,
+                truckH: parseFloat(document.getElementById('truckHeight').value) || 0,
+                hasTrailer: document.getElementById('hasTrailerToggle').checked,
+                trailerL: parseFloat(document.getElementById('trailerLength').value) || 0,
+                trailerW: parseFloat(document.getElementById('trailerWidth').value) || 0,
+                trailerH: parseFloat(document.getElementById('trailerHeight').value) || 0,
+                truckVolume: volumes.truckVol,
+                trailerVolume: volumes.trailerVol,
+                totalVolume: volumes.totalVol,
+                notes: document.getElementById('recordNotes').value.trim()
+            };
+
+            if (editId) {
+                const idx = records.findIndex(r => r.id === editId);
+                if (idx !== -1) records[idx] = { id: editId, ...recordData };
+            } else {
+                records.unshift({ id: recordId, ...recordData });
+            }
+
+            saveLocalBackup();
+            renderAll();
+            closeModal('entryFormModal');
+
+            if (editId) {
+                set(ref(db, `records/${editId}`), recordData).catch(err => console.log("Firebase sync fallback:", err));
+            } else {
+                const newRef = push(recordsRef);
+                set(newRef, recordData).catch(err => console.log("Firebase sync fallback:", err));
+            }
+        };
+
+        window.editRecord = function(id) {
+            const item = records.find(r => r.id === id);
+            if (!item) return;
+
+            document.getElementById('editRecordId').value = item.id;
+            document.getElementById('recordSite').value = item.site;
+            document.getElementById('displaySiteName').value = item.site;
+            document.getElementById('recordDateTime').value = item.dateTime;
+            document.getElementById('truckNumber').value = item.truckNumber;
+            document.getElementById('driverName').value = item.driverName;
+            document.getElementById('materialType').value = item.materialType;
+
+            document.getElementById('truckLength').value = item.truckL;
+            document.getElementById('truckWidth').value = item.truckW;
+            document.getElementById('truckHeight').value = item.truckH;
+
+            document.getElementById('hasTrailerToggle').checked = item.hasTrailer;
+            toggleTrailerSection();
+
+            if (item.hasTrailer) {
+                document.getElementById('trailerLength').value = item.trailerL;
+                document.getElementById('trailerWidth').value = item.trailerW;
+                document.getElementById('trailerHeight').value = item.trailerH;
+            }
+
+            document.getElementById('recordNotes').value = item.notes || '';
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> تعديل ذرعة - ${item.truckNumber}`;
+
+            calculateVolumes();
+            openModal('entryFormModal');
+        };
+
+        window.deleteRecord = function(id) {
+            const item = records.find(r => r.id === id);
+            if (!item) return;
+
+            if (confirm('هل أنت تأكد من إزالة هذا السجل نهائياً؟')) {
+                records = records.filter(r => r.id !== id);
+                saveLocalBackup();
+                renderAll();
+                remove(ref(db, `records/${id}`)).catch(err => console.log("Firebase remove fallback:", err));
+            }
+        };
+
+        window.removeDuplicatesByTruckNumber = function() {
+            if (records.length === 0) {
+                alert('لا توجد سجلات لإزالة التكرار منها.');
+                return;
+            }
+
+            if (!confirm('هل أنت تأكد من إزالة الذرعات المكررة لنفس رقم السيارة؟\n(سوف يتم الاحتفاظ بأحدث سجل وتاريخ لكل سيارة وحذف السجلات القديمة).')) {
+                return;
+            }
+
+            records.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+
+            const seenTrucks = new Set();
+            const uniqueRecords = [];
+            const removedIds = [];
+
+            records.forEach(record => {
+                const cleanTruckNum = (record.truckNumber || '').toLowerCase().trim();
+                if (!cleanTruckNum) {
+                    uniqueRecords.push(record);
+                } else if (!seenTrucks.has(cleanTruckNum)) {
+                    seenTrucks.add(cleanTruckNum);
+                    uniqueRecords.push(record);
+                } else {
+                    removedIds.push(record.id);
+                }
+            });
+
+            if (removedIds.length === 0) {
+                alert('لم يتم العثور على أي سجلات مكررة بناءً على رقم السيارة.');
+                return;
+            }
+
+            records = uniqueRecords;
+            saveLocalBackup();
+            renderAll();
+
+            removedIds.forEach(id => {
+                remove(ref(db, `records/${id}`)).catch(err => console.log("Firebase remove duplicate fallback error:", err));
+            });
+
+            alert(`تمت إزالة ${removedIds.length} سجل مكرر بنجاح!`);
+        };
+
+        window.printSingleRecord = function(id) {
+            const item = records.find(r => r.id === id);
+            if (!item) return;
+
+            document.getElementById('pDate').innerText = formatDate(item.dateTime);
+            document.getElementById('pSite').innerText = item.site;
+            document.getElementById('pTruckNum').innerText = item.truckNumber;
+            document.getElementById('pDriver').innerText = item.driverName;
+            document.getElementById('pMaterial').innerText = item.materialType;
+            document.getElementById('pTruckDim').innerText = `${item.truckL} م (طول) × ${item.truckW} م (عرض) × ${item.truckH} م (ارتفاع)`;
+            document.getElementById('pTruckVol').innerText = `${item.truckVolume.toFixed(2)} م³`;
+            
+            if (item.hasTrailer) {
+                document.getElementById('pTrailerDim').innerText = `${item.trailerL} م (طول) × ${item.trailerW} م (عرض) × ${item.trailerH} م (ارتفاع)`;
+                document.getElementById('pTrailerVol').innerText = `${item.trailerVolume.toFixed(2)} م³`;
+            } else {
+                document.getElementById('pTrailerDim').innerText = 'لا يوجد عربانة ملحقة';
+                document.getElementById('pTrailerVol').innerText = '-';
+            }
+
+            document.getElementById('pTotalVol').innerText = `${item.totalVolume.toFixed(2)} م³`;
+            document.getElementById('pNotes').innerText = item.notes || 'لا توجد ملاحظات مدونة';
+
+            document.body.classList.remove('print-all');
+            document.body.classList.add('print-single');
+            window.print();
+        };
+
+        window.printAllRecords = function() {
+            document.body.classList.remove('print-single');
+            document.body.classList.add('print-all');
+            window.print();
+        };
+
+        function renderAll() {
+            renderStats();
+            renderRecentTable();
+            renderAllDataTable();
+        }
+
+        function renderStats() {
+            document.getElementById('statTotalCount').innerText = records.length;
+            const totalVol = records.reduce((sum, r) => sum + (r.totalVolume || 0), 0);
+            document.getElementById('statTotalVolume').innerText = totalVol.toFixed(2);
+
+            const northCount = records.filter(r => r.site === 'الموقع الشمالي').length;
+            const southCount = records.filter(r => r.site === 'الموقع الجنوبي').length;
+
+            document.getElementById('statNorthCount').innerText = northCount;
+            document.getElementById('statSouthCount').innerText = southCount;
+            document.getElementById('modalTotalCount').innerText = records.length;
+        }
+
+        function renderRecentTable() {
+            const tbody = document.getElementById('recentRecordsBody');
+            tbody.innerHTML = '';
+
+            const recent = records.slice(0, 5);
+            if (recent.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-folder-open"></i><br>لا توجد ذرعات مسجلة حتى الآن</td></tr>`;
+                return;
+            }
+
+            recent.forEach(r => {
+                const siteBadge = r.site === 'الموقع الشمالي' ? 'badge-north' : 'badge-south';
+                const trailerText = r.hasTrailer ? `${r.trailerVolume.toFixed(2)} م³` : 'لا يوجد';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${formatDate(r.dateTime)}</td>
+                        <td><strong>${r.truckNumber}</strong></td>
+                        <td>${r.driverName}</td>
+                        <td><span class="badge-site ${siteBadge}">${r.site}</span></td>
+                        <td>${r.truckL} × ${r.truckW} × ${r.truckH}</td>
+                        <td>${trailerText}</td>
+                        <td style="font-weight:800; color:var(--accent-cyan);">${r.totalVolume.toFixed(2)} م³</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAllDataTable() {
+            const tbody = document.getElementById('allDataTableBody');
+            tbody.innerHTML = '';
+
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="empty-state"><i class="fa-solid fa-folder-open"></i><br>لا توجد بيانات بجدول السيارات</td></tr>`;
+                return;
+            }
+
+            records.forEach((r, idx) => {
+                const siteBadge = r.site === 'الموقع الشمالي' ? 'badge-north' : 'badge-south';
+                const truckDim = `${r.truckL} × ${r.truckW} × ${r.truckH}`;
+                const trailerDim = r.hasTrailer ? `${r.trailerL} × ${r.trailerW} × ${r.trailerH}` : '-';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${formatDate(r.dateTime)}</td>
+                        <td><span class="badge-site ${siteBadge}">${r.site}</span></td>
+                        <td><strong>${r.truckNumber}</strong></td>
+                        <td>${r.driverName}</td>
+                        <td>${r.materialType}</td>
+                        <td>${truckDim}</td>
+                        <td>${trailerDim}</td>
+                        <td style="font-weight:800; color:var(--accent-gold);">${r.totalVolume.toFixed(2)} م³</td>
+                        <td>
+                            <button class="action-icon-btn print" onclick="printSingleRecord('${r.id}')" title="طباعة ذرعة A4"><i class="fa-solid fa-print"></i></button>
+                            <button class="action-icon-btn edit" onclick="editRecord('${r.id}')" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-icon-btn delete" onclick="deleteRecord('${r.id}')" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.executeSearch = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const tbody = document.getElementById('searchResultsBody');
+            tbody.innerHTML = '';
+
+            if (!query) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">أدخل كلمة البحث للبدء...</td></tr>`;
+                return;
+            }
+
+            const filtered = records.filter(r => 
+                (r.truckNumber && r.truckNumber.toLowerCase().includes(query)) ||
+                (r.driverName && r.driverName.toLowerCase().includes(query)) ||
+                (r.materialType && r.materialType.toLowerCase().includes(query)) ||
+                (r.site && r.site.toLowerCase().includes(query))
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">لم يتم العثور على نتائج متطابقة</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                const siteBadge = r.site === 'الموقع الشمالي' ? 'badge-north' : 'badge-south';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${formatDate(r.dateTime)}</td>
+                        <td><strong>${r.truckNumber}</strong></td>
+                        <td>${r.driverName}</td>
+                        <td><span class="badge-site ${siteBadge}">${r.site}</span></td>
+                        <td style="font-weight:800; color:var(--accent-cyan);">${r.totalVolume.toFixed(2)} م³</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="printSingleRecord('${r.id}')">
+                                <i class="fa-solid fa-print"></i> طباعة A4
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        };
+
+        function formatDate(dtStr) {
+            if (!dtStr) return '';
+            const dt = new Date(dtStr);
+            return dt.toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+        }
+
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); };
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
+    </script>
+</body>
+</html>
